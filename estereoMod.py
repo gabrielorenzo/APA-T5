@@ -1,11 +1,30 @@
 """
-    Tarea 5 : Sonido estéreo y ficheros WAVE
+Tarea 5b
+Nombre y Apellidos: Gabriel Lorenzo Felix
 
-    Nombre y apellidos: Gabriel Lorenzo Felix
+"""
+
+USAGE= """
+estereoMod.py
+
+Usage:
+  estereoMod.py [mono] [options] <ficL> [<ficR>] <ficEste>
+  estereoMod.py --help
+  estereoMod.py --version
+
+Options:
+  --left, -l    Usa el canal izquierdo de la señal estereo [default: False]
+  --right, -r   Usa el canal derecho de la señal estereo  [default: False]
+  --suma, -s    Usa la semi-suma de los dos canales [default: False]
+  --diferencia, -d   Usa la semi-diferencia de los dos canales [default: False]
+
 """
 
 import struct
-
+import struct 
+import wave
+import numpy as np
+from docopt import docopt
 
 def readWave(fitWave):
     '''
@@ -169,12 +188,29 @@ def decEstereo(ficCod, ficEste):
         fpWave.write(struct.pack(fmtSen, *sen))
 
 
-signal, sampleRate = readWave('komm.wav')
-writeWave("copia.wav", signal, sampleRate)
-estereo2mono("komm.wav", "izquierdo.wav", 0)
-estereo2mono("komm.wav", "derecho.wav", 1)
-estereo2mono("komm.wav", "semisuma.wav", 2)
-estereo2mono("komm.wav", "semidiferencia.wav", 3)
-mono2estereo("izquierdo.wav", "derecho.wav", "conjunto.wav")
-codEstereo('komm.wav', 'codificado.wav')
-decEstereo('Codificado.wav', 'descodificado.wav') 
+def main():
+    args = docopt(USAGE, version="estereoMod.py - Gabriel Lorenzo, 2023")
+    
+    ficL = args['<ficL>']
+    ficR = args['<ficR>']
+    ficEste = args['<ficEste>']
+    ficMono = args['<ficMono>']
+    canal = 0
+
+    if args['mono']:
+        
+        if args['--left']:
+            canal = 0
+        elif args['--right']:
+            canal = 1
+        elif args['--suma']:
+            canal = 2
+        elif args['--diferencia']:
+            canal = 3
+
+        estereo2mono(ficEste, ficMono, canal)
+    else:
+        mono2estereo(ficL, ficR, ficEste)
+
+if __name__ == '__main__':
+    main()
